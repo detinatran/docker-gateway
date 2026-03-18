@@ -20,5 +20,5 @@ docker ps -a --filter "label=com.docker.mcp" --format "{{.ID}}" 2>/dev/null | xa
 ok "Containers cleaned"
 
 echo ""
-echo -e "${GREEN}✅ Teardown complete.${NC}"
+echo -e "${GREEN}[OK] Teardown complete.${NC}"
 echo ""

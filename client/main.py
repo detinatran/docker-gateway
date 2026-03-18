@@ -35,7 +35,7 @@ async def demo_list_tools(client: GatewayClient):
     """Step 1: Discover all available tools through the gateway."""
     print()
     print(f"{Colors.CYAN}{'─' * 65}{Colors.NC}")
-    print(f"{Colors.CYAN}  📋 Step 1: Discover Tools{Colors.NC}")
+    print(f"{Colors.CYAN}  Step 1: Discover Tools{Colors.NC}")
     print(f"{Colors.CYAN}{'─' * 65}{Colors.NC}")
     print()
 
@@ -95,7 +95,7 @@ async def demo_parallel_calls(client: GatewayClient):
     """Step 3: Call all 3 tools in parallel — compare total time vs sequential."""
     print()
     print(f"{Colors.CYAN}{'─' * 65}{Colors.NC}")
-    print(f"{Colors.CYAN}  ⚡ Step 3: Parallel Tool Calls{Colors.NC}")
+    print(f"{Colors.CYAN}  Step 3: Parallel Tool Calls{Colors.NC}")
     print(f"{Colors.CYAN}{'─' * 65}{Colors.NC}")
     print()
     log_info("Calling 3 tools simultaneously. Total time ≈ slowest single call.")
@@ -116,7 +116,7 @@ async def demo_parallel_calls(client: GatewayClient):
     results = await client.call_tools_parallel(calls)
 
     for (name, _), result in zip(calls, results):
-        status = f"{Colors.GREEN}✓{Colors.NC}" if result["success"] else f"{Colors.RED}✗{Colors.NC}"
+        status = f"{Colors.GREEN}[Success]{Colors.NC}" if result["success"] else f"{Colors.RED}[Failed]{Colors.NC}"
         latency = f"{result['latency_ms']:.0f}ms"
         print(f"  {status} {name:<25} {latency:>8}")
 
@@ -127,7 +127,7 @@ async def demo_error_handling(client: GatewayClient):
     """Step 4: Test error scenarios — tool not found, timeout simulation."""
     print()
     print(f"{Colors.CYAN}{'─' * 65}{Colors.NC}")
-    print(f"{Colors.CYAN}  🛡️  Step 4: Error Handling{Colors.NC}")
+    print(f"{Colors.CYAN}  Step 4: Error Handling{Colors.NC}")
     print(f"{Colors.CYAN}{'─' * 65}{Colors.NC}")
     print()
 
@@ -182,7 +182,7 @@ def _print_result_preview(label: str, result: str, max_lines: int = 8):
 async def main():
     print()
     print(f"{Colors.MAGENTA}{'═' * 65}{Colors.NC}")
-    print(f"{Colors.MAGENTA}  🐳 Docker MCP Gateway — Interactive Demo{Colors.NC}")
+    print(f"{Colors.MAGENTA}  Docker MCP Gateway — Interactive Demo{Colors.NC}")
     print(f"{Colors.MAGENTA}{'═' * 65}{Colors.NC}")
     print()
     log_info(f"Servers: {', '.join(SERVERS)}")

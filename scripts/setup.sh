@@ -23,7 +23,7 @@ error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
 echo ""
 echo -e "${GREEN}═══════════════════════════════════════════════════════════════${NC}"
-echo -e "${GREEN}  🐳 Docker MCP Gateway Demo — Setup${NC}"
+echo -e "${GREEN}  Docker MCP Gateway Demo — Setup${NC}"
 echo -e "${GREEN}═══════════════════════════════════════════════════════════════${NC}"
 echo ""
 
@@ -136,7 +136,7 @@ ok "MCP SDK installed"
 # ─── Summary ─────────────────────────────────────────────────────────────────
 echo ""
 echo -e "${GREEN}═══════════════════════════════════════════════════════════════${NC}"
-echo -e "${GREEN}  ✅ Setup Complete!${NC}"
+echo -e "${GREEN}  [OK] Setup Complete!${NC}"
 echo -e "${GREEN}═══════════════════════════════════════════════════════════════${NC}"
 echo ""
 info "3 MCP servers: github (26 tools) · atlassian (73 tools) · fetch (1 tool)"

@@ -345,7 +345,7 @@ class GatewayClient:
         s = self._stats
         print()
         print(f"{Colors.MAGENTA}{'═' * 65}{Colors.NC}")
-        print(f"{Colors.MAGENTA}  📊 Session Summary{Colors.NC}")
+        print(f"{Colors.MAGENTA}  Session Summary{Colors.NC}")
         print(f"{Colors.MAGENTA}{'═' * 65}{Colors.NC}")
         print(f"  Profile:          {self._profile}")
         print(f"  Total calls:      {s.total_calls}")
@@ -359,7 +359,7 @@ class GatewayClient:
             print(f"  {'Tool':<30} {'Latency':>10} {'Status':>10}")
             print(f"  {'─' * 30} {'─' * 10} {'─' * 10}")
             for log in s.logs:
-                status = f"{Colors.GREEN}✓{Colors.NC}" if log.success else f"{Colors.RED}✗{Colors.NC}"
+                status = f"{Colors.GREEN}[Success]{Colors.NC}" if log.success else f"{Colors.RED}[Failed]{Colors.NC}"
                 print(f"  {log.tool_name:<30} {log.latency_ms:>8.0f}ms {status:>10}")
 
         print(f"{Colors.MAGENTA}{'═' * 65}{Colors.NC}")
