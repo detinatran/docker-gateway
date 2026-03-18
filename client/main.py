@@ -23,8 +23,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from gateway import GatewayClient, log_info, log_ok, log_warn, log_error, Colors
 
 
-# The 3 MCP servers we'll demo through the gateway
-SERVERS = ["github", "atlassian", "fetch"]
+# MCP servers we'll demo through the gateway
+SERVERS = ["github", "atlassian", "fetch", "google-sheets"]
 
 
 # ─────────────────────────────────────────────────────────────────────────────

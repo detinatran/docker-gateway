@@ -21,6 +21,7 @@ Python Client ──stdio──▶ Docker MCP Gateway ──▶ MCP Servers (Doc
 | **github** | `mcp/github` | 26 tools | `GITHUB_PERSONAL_ACCESS_TOKEN` (optional) |
 | **atlassian** | `mcp/atlassian` | 73 tools (Jira + Confluence) | `JIRA_URL`, `JIRA_USERNAME`, `JIRA_API_TOKEN` |
 | **fetch** | `mcp/fetch` | 1 tool | None |
+| **google-sheets**| `mcp/google-sheets:local`| 10+ tools (CRUD) | `GOOGLE_SHEETS_CREDENTIALS_JSON` (optional) |
 
 ## Prerequisites
 
@@ -47,7 +48,7 @@ Python Client ──stdio──▶ Docker MCP Gateway ──▶ MCP Servers (Doc
 ./scripts/teardown.sh
 ```
 
-## 🤖 AI Agent Demo
+## AI Agent Demo
 
 We have built a fully functional LLM Agent (`client/llm_agent.py`) capable of parsing your natural language query, dynamically selecting the right MCP server to use, and executing the corresponding tools!
 

@@ -26,7 +26,7 @@ docker mcp server ls 2>&1
 echo ""
 
 # ─── 2. Show server details ─────────────────────────────────────────────────
-for server in github atlassian fetch; do
+for server in github atlassian fetch google-sheets; do
   info "Server '${server}' tools:"
   docker mcp server inspect "${server}" 2>&1 | python3 -c "
 import sys, json

@@ -1,0 +1,32 @@
+version: 3
+name: mcp-gateway-local
+displayName: MCP Gateway (Local)
+registry:
+  google-sheets:
+    title: Google Sheets
+    description: Read/write Google Sheets via a Google service account (mounted into the container).
+    type: server
+    dateAdded: "2026-03-18T00:00:00Z"
+    image: mcp/google-sheets:local
+    ref: ""
+    # mcp-google-sheets expects: --transport stdio (NOT --transport=stdio)
+    command:
+      - --transport
+      - stdio
+    env:
+      - name: SERVICE_ACCOUNT_PATH
+        value: /workspace/service_account.json
+    volumes:
+      - '{{google-sheets.service_account_path}}:/workspace/service_account.json:ro'
+    prompts: 0
+    resources: {}
+    config:
+      - name: google-sheets
+        description: Configure Google Sheets authentication.
+        type: object
+        properties:
+          service_account_path:
+            type: string
+            description: Absolute path on the host to your service_account.json
+        required:
+          - service_account_path

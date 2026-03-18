@@ -42,7 +42,7 @@ except ImportError:
     pass # If dotenv is somehow not installed, fallback to system env vars
 
 
-AVAILABLE_SERVERS = ["github", "atlassian", "fetch"]
+AVAILABLE_SERVERS = ["github", "atlassian", "fetch", "google-sheets"]
 
 
 async def get_servers_for_prompt(prompt: str, llm_client: AsyncOpenAI, model: str) -> List[str]:
@@ -54,6 +54,7 @@ You are a routing agent. Available tool servers are:
 - 'github': repos, issues, PRs, code search, users, etc.
 - 'atlassian': Jira issues, sprints, projects, Confluence pages, etc.
 - 'fetch': fetch public URL contents (curl/http GET).
+- 'google-sheets': read/write Google Sheets via service account.
 
 Based on the user's prompt, reply ONLY with a JSON array of the server strings you need.
 Example: ["github", "atlassian"]
@@ -141,21 +142,38 @@ async def run_agent(prompt: str, servers: List[str], llm_client: AsyncOpenAI, mo
         print(f"{Colors.BLUE}User:{Colors.NC} {prompt}\n")
         
         while True:
-            response = await llm_client.chat.completions.create(
-                model=model,
-                messages=messages,
-                tools=openai_tools,
-                tool_choice="auto",
-            )
+            async def _do_chat_call():
+                return await llm_client.chat.completions.create(
+                    model=model,
+                    messages=messages,
+                    tools=openai_tools,
+                    tool_choice="auto",
+                    max_tokens=600,
+                    temperature=0.0,
+                )
+
+            response = await _do_chat_call()
             
             message = response.choices[0].message
+            finish_reason = getattr(response.choices[0], "finish_reason", None)
             messages.append(message)  # Add assistant message to history
             
+            # Some OpenAI-compatible providers occasionally return an empty
+            # assistant message. Retry once to avoid silently exiting.
+            if (not message.content) and (not message.tool_calls):
+                log_warn(f"LLM returned empty message (finish_reason={finish_reason}). Retrying once...")
+                response = await _do_chat_call()
+                message = response.choices[0].message
+                finish_reason = getattr(response.choices[0], "finish_reason", None)
+                messages.append(message)
+
             if message.content:
                 print(f"{Colors.GREEN}Response:{Colors.NC}\n{message.content}")
                 
             if not message.tool_calls:
                 # No more tools to call, we are done
+                if not message.content:
+                    log_warn(f"No tool calls and no content (finish_reason={finish_reason}).")
                 break
                 
             # Execute Tool Calls

@@ -1,6 +1,10 @@
 # Environment secrets
 .env
 
+# Google credentials (do not commit)
+service_account.json
+credentials.json
+
 # Python
 __pycache__/
 *.pyc

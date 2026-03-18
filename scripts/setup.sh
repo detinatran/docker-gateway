@@ -2,7 +2,7 @@
 # =============================================================================
 # setup.sh — Enable MCP servers and configure secrets
 #
-# Servers: github · atlassian (Jira + Confluence) · fetch
+# Servers: github · atlassian (Jira + Confluence) · fetch · google-sheets (local image)
 # =============================================================================
 set -euo pipefail
 
@@ -48,7 +48,7 @@ info "Resetting existing server config..."
 docker mcp server reset 2>/dev/null || true
 ok "Clean slate"
 
-# ─── Enable 3 servers ────────────────────────────────────────────────────────
+# ─── Enable servers ──────────────────────────────────────────────────────────
 info "Enabling servers from Docker MCP catalog..."
 
 docker mcp server enable github
@@ -59,6 +59,24 @@ ok "Enabled: atlassian (73 tools — Jira + Confluence)"
 
 docker mcp server enable fetch
 ok "Enabled: fetch (1 tool — URL content fetching)"
+
+# ─── Google Sheets server (custom local catalog entry) ───────────────────────
+info "Building local image for Google Sheets MCP server..."
+docker build -t mcp/google-sheets:local -f "${PROJECT_DIR}/servers/google-sheets/Dockerfile" "${PROJECT_DIR}/servers/google-sheets" >/dev/null
+ok "Built: mcp/google-sheets:local"
+
+info "Registering Google Sheets server into Docker MCP catalogs..."
+docker mcp catalog init 2>/dev/null || true
+
+if ! docker mcp catalog ls 2>/dev/null | awk -F: '{print $1}' | grep -qx "local"; then
+  docker mcp catalog create local >/dev/null
+fi
+
+docker mcp catalog add local google-sheets "${PROJECT_DIR}/catalog/google-sheets.yaml" --force >/dev/null
+ok "Catalog entry added: google-sheets"
+
+docker mcp server enable google-sheets
+ok "Enabled: google-sheets (Google Sheets via service account)"
 
 echo ""
 info "Enabled servers:"
@@ -96,12 +114,18 @@ if [ -f "${ENV_FILE}" ]; then
     warn "No JIRA_API_TOKEN — Jira tools won't authenticate"
   fi
 
-  # ── Jira/Atlassian config (URL + username → config.yaml) ──
+  # ── Non-secret config (URL, usernames, file paths → config.yaml) ──────────
   # These are NON-SECRET config values that gateway templates inject as env vars.
-  # Format must match catalog templates: {{atlassian.jira.url}}, {{atlassian.jira.username}}
+  # We'll write both Atlassian + Google Sheets config in one file.
+
+  SHEETS_SERVICE_ACCOUNT_PATH="${GOOGLE_SHEETS_SERVICE_ACCOUNT_PATH:-${PROJECT_DIR}/service_account.json}"
+
+  # Start fresh YAML file
+  : > "${MCP_CONFIG_FILE}"
+
   if [ -n "${JIRA_URL:-}" ] && [ "${JIRA_URL}" != "https://your-company.atlassian.net" ]; then
     CONF_URL="${JIRA_URL}/wiki"
-    cat > "${MCP_CONFIG_FILE}" << YAMLEOF
+    cat >> "${MCP_CONFIG_FILE}" << YAMLEOF
 atlassian:
   jira:
     url: "${JIRA_URL}"
@@ -115,6 +139,19 @@ YAMLEOF
     info "  JIRA_USER = ${JIRA_USER}"
   else
     warn "No JIRA_URL — Jira/Confluence tools won't connect"
+  fi
+
+  if [ -f "${SHEETS_SERVICE_ACCOUNT_PATH}" ]; then
+    cat >> "${MCP_CONFIG_FILE}" << YAMLEOF
+google-sheets:
+  service_account_path: "${SHEETS_SERVICE_ACCOUNT_PATH}"
+YAMLEOF
+    ok "Google Sheets config → ${MCP_CONFIG_FILE}"
+    info "  GOOGLE_SHEETS_SERVICE_ACCOUNT_PATH = ${SHEETS_SERVICE_ACCOUNT_PATH}"
+  else
+    warn "No service_account.json found for Google Sheets"
+    warn "  Expected at: ${SHEETS_SERVICE_ACCOUNT_PATH}"
+    warn "  Set GOOGLE_SHEETS_SERVICE_ACCOUNT_PATH in .env if needed"
   fi
 else
   warn "No .env file found. Copy .env.example to .env and add your keys."
@@ -139,7 +176,7 @@ echo -e "${GREEN}═════════════════════
 echo -e "${GREEN}  [OK] Setup Complete!${NC}"
 echo -e "${GREEN}═══════════════════════════════════════════════════════════════${NC}"
 echo ""
-info "3 MCP servers: github (26 tools) · atlassian (73 tools) · fetch (1 tool)"
+info "4 MCP servers: github (26 tools) · atlassian (73 tools) · fetch (1 tool) · google-sheets (Google Sheets)"
 info "Each server runs in its own isolated Docker container"
 echo ""
 info "Next steps:"

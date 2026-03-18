@@ -185,10 +185,14 @@ class GatewayClient:
 
         tools = []
         for tool in result.tools:
+            input_schema = tool.inputSchema if hasattr(tool, 'inputSchema') else {}
             tools.append({
                 "name": tool.name,
                 "description": tool.description or "",
-                "input_schema": tool.inputSchema if hasattr(tool, 'inputSchema') else {},
+                # Keep OpenAI-compatible key casing expected by llm_agent.py
+                "inputSchema": input_schema,
+                # Back-compat alias (some earlier code used snake_case)
+                "input_schema": input_schema,
             })
 
         self._tools_cache = tools
