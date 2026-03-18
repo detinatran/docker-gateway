@@ -1,0 +1,19 @@
+# Environment secrets
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+venv/
+.venv/
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/mcp.json
+.idea/

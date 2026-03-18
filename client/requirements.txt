@@ -1,0 +1,3 @@
+# Python MCP SDK for communicating with the gateway via stdio
+mcp>=1.9.0
+openai>=1.14.0
